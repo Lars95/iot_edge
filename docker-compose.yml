@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  mqtt-broker:
+    image: eclipse-mosquitto
+    container_name: mqtt-broker
+    restart: unless-stopped
+    ports:
+      - "8250:8250"
+    environment:
+      MOSQUITTO_CONFIG_FILE: /mosquitto/config/mosquitto.conf
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    networks:
+      - iotedgenetwork
+
+  mqtt-publisher:
+    build:
+      context: .
+      dockerfile: mqtt-publisher.Dockerfile
+    container_name: mqtt-publisher
+    privileged: true
+    devices:
+      - /dev/gpiomem:/dev/gpiomem
+    restart: unless-stopped
+    depends_on:
+      - mqtt-broker
+    networks:
+      - iotedgenetwork
+
+  influxdb:
+    image: arm32v7/influxdb
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      INFLUXDB_DB: "iotedge"
+      INFLUXDB_ADMIN_USER: "admin"
+      INFLUXDB_ADMIN_PASSWORD: "Stzpwk35i@gF2P"
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    networks:
+      - iotedgenetwork
+
+  telegraf:
+    build:
+      context: .
+      dockerfile: telegraf.Dockerfile
+    container_name: telegraf
+    restart: unless-stopped
+    depends_on:
+      - mqtt-broker
+      - influxdb
+    networks:
+      - iotedgenetwork
+
+networks:
+  iotedgenetwork:
+    driver: bridge
+volumes:
+  influxdb_data:
