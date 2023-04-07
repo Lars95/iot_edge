@@ -44,14 +44,14 @@ services:
       - iotedgenetwork
 
   telegraf:
-    build:
-      context: .
-      dockerfile: telegraf.Dockerfile
+    image: telegraf:1.18.0
     container_name: telegraf
     restart: unless-stopped
     depends_on:
       - mqtt-broker
       - influxdb
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf
     networks:
       - iotedgenetwork
 
