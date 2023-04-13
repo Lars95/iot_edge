@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir pandas paho-mqtt numpy scipy scikit-learn
+RUN pip install --no-cache-dir -r requirements-mlruntime.txt 
 
 # Copy the Python script and the trained model
 COPY score_dht22_anomalies.py .
