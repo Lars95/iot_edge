@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt ./
+COPY requirements-mlruntime.txt ./
 RUN pip install --no-cache-dir -r requirements-mlruntime.txt 
 
 # Copy the Python script and the trained model
